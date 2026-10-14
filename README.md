@@ -4,7 +4,7 @@ An interactive physics project built using HTML, CSS and JavaScript. Explore 12 
 
 ## Play the Game
 
-file:///C:/Users/sonya/OneDrive/Desktop/HTML/phys-lab.html
+(file:///C:/Users/sonya/OneDrive/Desktop/HTML/phys-lab.html)
 
 ## Features
 
