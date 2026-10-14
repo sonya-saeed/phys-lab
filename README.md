@@ -2,12 +2,11 @@
 
 An interactive physics project built using HTML, CSS and JavaScript. Explore 12 physics mini-games with live simulations, adjustable variables and real-time graphs.
 
-## 🚀 Play the Game
+## Play the Game
 
-[**Click here to play PHYS//LAB**]
 file:///C:/Users/sonya/OneDrive/Desktop/HTML/phys-lab.html
 
-## 🎮 Features
+## Features
 
 - 12 interactive physics mini-games
 - Real-time simulations and graphs
@@ -17,7 +16,7 @@ file:///C:/Users/sonya/OneDrive/Desktop/HTML/phys-lab.html
 - Futuristic black interface with neon accents
 - Responsive design
 
-## 🧪 The 12 Experiments
+## The 12 Experiments
 
 1. **Motion Lab** — displacement, velocity and acceleration
 2. **Gravity Drop** — gravitational acceleration and free fall
@@ -32,13 +31,13 @@ file:///C:/Users/sonya/OneDrive/Desktop/HTML/phys-lab.html
 11. **Magnetic Field** — magnetic field strength
 12. **Relativity Runner** — speed and relativistic effects
 
-## 💻 Run Locally
+## Run Locally
 
 1. Download `index.html` from this repository.
 2. Open the file in a modern web browser.
 3. Scroll through the experiments and interact with the controls.
 
-## 🛠️ Technologies
+## Technologies
 
 - HTML5
 - CSS3
@@ -46,7 +45,7 @@ file:///C:/Users/sonya/OneDrive/Desktop/HTML/phys-lab.html
 - HTML Canvas
 - GitHub Pages
 
-## 🎯 Purpose
+## Purpose
 
 This project combines physics, mathematics and programming to visualise scientific concepts through interactive experiments.
 
