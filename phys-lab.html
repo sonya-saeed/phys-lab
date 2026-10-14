@@ -1,0 +1,464 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHYS//LAB — Physics Arcade</title>
+<style>
+:root {
+  --accent: #ff4fa3;
+  --glow: #ff4fa344;
+  --bg: #050608;
+  --panel: #0c0e13;
+  --border: #252833;
+  --text: #f3f5fa;
+  --muted: #858b9c;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+button, input, select { font: inherit; }
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: #151821;
+  color: var(--text);
+  border-radius: 9px;
+  padding: 9px 13px;
+}
+button:hover, button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #08090def;
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+.logo { font-weight: 900; letter-spacing: 3px; }
+.logo span { color: var(--accent); }
+.header-right { display: flex; align-items: center; gap: 9px; }
+main { max-width: 1250px; padding: 25px 20px 70px; margin: auto; }
+.hero {
+  min-height: 270px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 35px 0;
+}
+.eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+h1 { font-size: clamp(38px, 7vw, 76px); line-height: .98; margin: 16px 0; letter-spacing: -3px; }
+h1 span { color: var(--accent); }
+.hero p { color: var(--muted); max-width: 570px; line-height: 1.7; }
+.hero-bottom { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
+.primary { background: var(--accent); color: #08090b; font-weight: 800; border-color: var(--accent); }
+.primary:hover { color: #08090b; filter: brightness(1.12); }
+.section-heading {
+  display: flex; justify-content: space-between; align-items: end;
+  gap: 10px; margin: 38px 0 16px;
+}
+.section-heading h2 { margin: 0; font-size: 22px; }
+.section-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+.experiment {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(145deg, #0e1016, #08090c);
+  padding: 19px;
+  margin: 18px 0 28px;
+  scroll-margin-top: 85px;
+  overflow: hidden;
+}
+.experiment-top {
+  display: flex; align-items: start; justify-content: space-between; gap: 12px;
+  margin-bottom: 16px;
+}
+.game-number { color: var(--accent); font-size: 11px; letter-spacing: 2px; font-weight: 800; }
+.experiment h3 { margin: 5px 0 6px; font-size: 21px; }
+.experiment .description { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+.tag {
+  font-size: 10px; border: 1px solid var(--border); border-radius: 20px;
+  padding: 6px 9px; white-space: nowrap; color: var(--muted);
+}
+.game-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(230px, 1fr); gap: 13px; }
+.visual {
+  min-width: 0; border: 1px solid var(--border); border-radius: 12px;
+  background-color: #080a0f;
+  background-image: linear-gradient(#1b1e2833 1px, transparent 1px),
+                    linear-gradient(90deg, #1b1e2833 1px, transparent 1px);
+  background-size: 25px 25px;
+  padding: 8px; position: relative;
+}
+canvas { display: block; width: 100%; height: 235px; }
+.graph { height: 145px; }
+.visual-label {
+  position: absolute; top: 12px; left: 14px; font-size: 9px;
+  letter-spacing: 1.5px; color: var(--muted); pointer-events: none;
+}
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat { padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: #101219; }
+.stat small { color: var(--muted); font-size: 10px; display: block; margin-bottom: 8px; }
+.stat strong { font-size: 19px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.controls { padding: 13px; border: 1px solid var(--border); border-radius: 10px; background: #101219; }
+.control { margin-bottom: 15px; }
+.control:last-child { margin-bottom: 0; }
+.control-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 9px; gap: 10px; }
+.control-head output { color: var(--accent); font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+.game-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.graph-title { color: var(--muted); font-size: 10px; letter-spacing: 1px; padding: 5px 3px 8px; }
+.formula {
+  color: var(--muted); font-size: 12px; line-height: 1.6;
+  padding: 10px 12px; border-left: 2px solid var(--accent);
+  background: #11131a; border-radius: 0 7px 7px 0;
+}
+.formula code { color: var(--text); }
+.avatar {
+  width: 23px; height: 23px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 16px var(--glow); display: inline-block;
+}
+.color-options { display: flex; gap: 7px; align-items: center; }
+.color-dot { width: 23px; height: 23px; border-radius: 50%; padding: 0; }
+.color-dot[data-color="pink"] { background: #ff4fa3; }
+.color-dot[data-color="green"] { background: #56f7a5; }
+.color-dot[data-color="blue"] { background: #53a7ff; }
+footer { text-align: center; padding: 35px; color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); }
+@media(max-width:720px) {
+  header { padding: 12px 4%; }
+  .logo { letter-spacing: 1px; font-size: 13px; }
+  .game-grid { grid-template-columns: 1fr; }
+  .hero { min-height: 235px; }
+  h1 { letter-spacing: -2px; }
+  .experiment { padding: 13px; }
+  canvas { height: 210px; }
+  .graph { height: 135px; }
+  .tag { display: none; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">PHYS<span>//</span>LAB</div>
+  <div class="header-right">
+    <span style="font-size:10px;color:var(--muted)">AVATAR</span>
+    <div class="color-options">
+      <button class="color-dot active" data-color="pink" aria-label="Pink avatar"></button>
+      <button class="color-dot" data-color="green" aria-label="Green avatar"></button>
+      <button class="color-dot" data-color="blue" aria-label="Blue avatar"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="eyebrow">INTERACTIVE PHYSICS / BUILD 001</div>
+    <h1>REALITY IS<br><span>SIMULATABLE.</span></h1>
+    <p>12 interactive physics experiments. Change the variables, watch the world react, and understand the mathematics behind the motion.</p>
+    <div class="hero-bottom">
+      <button class="primary" onclick="document.querySelector('#game-1').scrollIntoView({behavior:'smooth'})">ENTER THE LAB ↘</button>
+      <button onclick="document.querySelector('#game-12').scrollIntoView({behavior:'smooth'})">SKIP TO EXPERIMENT 12</button>
+    </div>
+  </section>
+
+  <div class="section-heading">
+    <div><h2>Experiment archive</h2><p>01 — 12 / LIVE SIMULATIONS</p></div>
+    <span class="tag">SCROLL TO EXPLORE ↓</span>
+  </div>
+
+  <div id="experiments"></div>
+</main>
+<footer>PHYS//LAB &nbsp;·&nbsp; LEARN THE LAWS. PLAY WITH REALITY.</footer>
+
+<script>
+const ACCENTS = {
+  pink: { main:"#ff4fa3", glow:"#ff4fa344" },
+  green: { main:"#56f7a5", glow:"#56f7a544" },
+  blue: { main:"#53a7ff", glow:"#53a7ff44" }
+};
+let avatarColor = "pink";
+document.querySelectorAll(".color-dot").forEach(btn => {
+  btn.addEventListener("click", () => {
+    avatarColor = btn.dataset.color;
+    document.documentElement.style.setProperty("--accent", ACCENTS[avatarColor].main);
+    document.documentElement.style.setProperty("--glow", ACCENTS[avatarColor].glow);
+    document.querySelectorAll(".color-dot").forEach(b => b.classList.toggle("active", b === btn));
+    document.querySelectorAll("canvas").forEach(c => c.dataset.dirty = "1");
+    renderAll();
+  });
+});
+
+const games = [
+ {title:"Motion Lab", tag:"KINEMATICS", desc:"Drive a particle through space. Explore how velocity and acceleration change displacement over time.",
+  formula:"s = ut + ½at²", controls:[
+   ["Velocity", "u",0,30,12,"m/s"],["Acceleration","a",-5,5,1,"m/s²"]],
+  stats:[["Displacement","m"],["Velocity","m/s"]],
+  sim:(p,t)=>({s:p.u*t+.5*p.a*t*t,v:p.u+p.a*t}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   let x=40+((p.u*t+.5*p.a*t*t)%Math.max(1,w-100));dot(ctx,x,h*.56,10);line(ctx,40,h*.76,x,h*.76);text(ctx,"START",40,h*.87);text(ctx,"PARTICLE",x,h*.43);}
+ },
+ {title:"Gravity Drop", tag:"GRAVITATION", desc:"Release an object and observe its fall. Compare different gravitational fields and starting heights.",
+  formula:"h = h₀ − ½gt²", controls:[
+   ["Gravity","g",1,25,9.81,"m/s²"],["Starting height","h",10,200,100,"m"]],
+  stats:[["Height","m"],["Fall time","s"]],
+  sim:(p,t)=>({height:Math.max(0,p.h-.5*p.g*t*t),fall:Math.min(t,Math.sqrt(2*p.h/p.g))}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   line(ctx,w*.18,h*.85,w*.82,h*.85);let y=h*.15+Math.min(1,t/Math.sqrt(2*p.h/p.g))*(h*.67);
+   dot(ctx,w*.5,y,9);line(ctx,w*.5,h*.15,w*.5,y);text(ctx,"DROP",w*.5,h*.1);}
+ },
+ {title:"Trajectory Lab", tag:"PROJECTILES", desc:"Launch a projectile at different angles. Find the balance between horizontal range and maximum height.",
+  formula:"R = u² sin(2θ) / g", controls:[
+   ["Launch speed","u",5,40,20,"m/s"],["Angle","a",5,85,45,"°"]],
+  stats:[["Range","m"],["Max height","m"]],
+  sim:(p,t)=>{let a=p.a*Math.PI/180,g=9.81;
+   return {range:p.u*p.u*Math.sin(2*a)/g,height:p.u*p.u*Math.sin(a)**2/(2*g),flight:2*p.u*Math.sin(a)/g};},
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   let a=p.a*Math.PI/180,g=9.81,flight=2*p.u*Math.sin(a)/g;
+   ctx.beginPath();ctx.strokeStyle=accent();ctx.lineWidth=2;
+   for(let i=0;i<=100;i++){let q=i/100*flight,x=p.u*Math.cos(a)*q,y=p.u*Math.sin(a)*q-.5*g*q*q;
+   let px=25+x/Math.max(1,p.u*p.u/9.81)* (w-50),py=h-20-y/Math.max(1,p.u*p.u/20)*(h-50);
+   if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();
+   let q=(t%Math.max(.1,flight)),x=25+p.u*Math.cos(a)*q/Math.max(.1,flight)*(w-50);
+   let y=h-20-(p.u*Math.sin(a)*q-.5*g*q*q)/Math.max(1,p.u*p.u/20)*(h-50);
+   dot(ctx,x,Math.max(10,Math.min(h-20,y)),7);}
+ },
+ {title:"Wave Rider", tag:"WAVES", desc:"Change frequency, amplitude, and wavelength to see how a travelling wave changes shape.",
+  formula:"v = fλ  |  y = A sin(kx − ωt)", controls:[
+   ["Amplitude","A",5,60,30,"px"],["Frequency","f",0.5,5,2,"Hz"],["Wavelength","L",40,200,100,"px"]],
+  stats:[["Wave speed","m/s"],["Frequency","Hz"]],
+  sim:p=>({speed:p.f*p.L/100,frequency:p.f}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   ctx.beginPath();ctx.strokeStyle=accent();ctx.lineWidth=2;
+   for(let x=0;x<w;x++){let y=h/2-p.A*Math.sin(x/(p.L)*Math.PI*2-t*p.f);if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();}
+ },
+ {title:"Newton's Arena", tag:"FORCES", desc:"Apply force to a mass and see Newton's second law in action. More force means more acceleration.",
+  formula:"F = ma  →  a = F/m", controls:[
+   ["Applied force","F",0,100,30,"N"],["Mass","m",1,50,10,"kg"]],
+  stats:[["Acceleration","m/s²"],["Force","N"]],
+  sim:p=>({acceleration:p.F/p.m,force:p.F}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   let x=35+(t*30)%Math.max(1,w-100);ctx.fillStyle=accent();ctx.fillRect(x,h*.5-18,38,36);
+   line(ctx,x+38,h*.5,x+38+Math.min(80,p.F),h*.5);text(ctx,"F →",x+45,h*.5-12);}
+ },
+ {title:"Energy Reactor", tag:"ENERGY", desc:"Convert height into kinetic energy. Adjust mass and height to compare stored gravitational potential energy.",
+  formula:"Eₚ = mgh  |  Eₖ = ½mv²", controls:[
+   ["Mass","m",1,50,10,"kg"],["Height","h",1,100,30,"m"]],
+  stats:[["Potential energy","J"],["Speed from fall","m/s"]],
+  sim:p=>({energy:p.m*9.81*p.h,speed:Math.sqrt(2*9.81*p.h)}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   let bh=Math.min(h*.72,p.h/100*h*.72);
+   ctx.fillStyle=accent();ctx.globalAlpha=.25;ctx.fillRect(w*.3,h*.85-bh,w*.4,bh);ctx.globalAlpha=1;
+   line(ctx,w*.18,h*.85,w*.82,h*.85);dot(ctx,w*.5,h*.85-bh,8);
+   text(ctx,Math.round(p.m*9.81*p.h)+" J",w*.5,h*.85-bh-17);}
+ },
+ {title:"Circuit Breaker", tag:"ELECTRICITY", desc:"Build an imaginary circuit. Explore how voltage and resistance affect current flow.",
+  formula:"V = IR  →  I = V/R", controls:[
+   ["Voltage","V",1,24,12,"V"],["Resistance","R",1,100,12,"Ω"]],
+  stats:[["Current","A"],["Power","W"]],
+  sim:p=>({current:p.V/p.R,power:p.V*p.V/p.R}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);
+   ctx.strokeStyle=accent();ctx.lineWidth=2;ctx.strokeRect(w*.2,h*.25,w*.6,h*.5);
+   ctx.fillStyle=accent();ctx.fillRect(w*.44,h*.18,w*.12,h*.14);
+   ctx.beginPath();ctx.moveTo(w*.43,h*.5);ctx.lineTo(w*.57,h*.5);ctx.stroke();
+   for(let i=0;i<5;i++){let x=w*.23+(t*40+i*32)%(w*.52);dot(ctx,x,h*.25,3);}
+   text(ctx,"BATTERY",w*.5,h*.14);text(ctx,"RESISTOR",w*.5,h*.68);}
+ },
+ {title:"Momentum Clash", tag:"COLLISIONS", desc:"Compare momentum for different masses and velocities. Momentum is conserved in an isolated collision.",
+  formula:"p = mv", controls:[
+   ["Mass","m",1,30,10,"kg"],["Velocity","v",-20,20,8,"m/s"]],
+  stats:[["Momentum","kg·m/s"],["Kinetic energy","J"]],
+  sim:p=>({momentum:p.m*p.v,energy:.5*p.m*p.v*p.v}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   let x=w/2+Math.sin(t*2)*Math.min(w*.3,Math.abs(p.v)*4);
+   dot(ctx,x,h*.48,Math.min(18,7+p.m/3));line(ctx,w/2,h*.8,x,h*.8);
+   text(ctx,"MOMENTUM",w/2,h*.2);}
+ },
+ {title:"Pressure Chamber", tag:"FLUIDS", desc:"Explore how pressure changes with depth in a liquid. Increase density or depth to see the pressure rise.",
+  formula:"P = ρgh", controls:[
+   ["Density","d",500,1500,1000,"kg/m³"],["Depth","h",1,100,20,"m"]],
+  stats:[["Pressure","Pa"],["Pressure","kPa"]],
+  sim:p=>({pressure:p.d*9.81*p.h,kpa:p.d*9.81*p.h/1000}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);
+   let water=h*.7;ctx.fillStyle="#2479ff22";ctx.fillRect(w*.15,h*.18,w*.7,water);
+   ctx.strokeStyle="#53a7ff";ctx.lineWidth=2;ctx.strokeRect(w*.15,h*.18,w*.7,water);
+   let y=h*.18+Math.min(.95,p.h/100)*water;
+   dot(ctx,w*.5,y,8);line(ctx,w*.5,h*.18,w*.5,y);
+   text(ctx,"DEPTH",w*.5,y-17);}
+ },
+ {title:"Thermal Lab", tag:"THERMODYNAMICS", desc:"Heat a material and watch its temperature change. Compare energy input and the mass of a sample.",
+  formula:"Q = mcΔT", controls:[
+   ["Energy added","Q",100,10000,3000,"J"],["Mass","m",0.1,10,2,"kg"],["Specific heat","c",100,5000,900,"J/kg°C"]],
+  stats:[["Temperature rise","°C"],["Energy added","J"]],
+  sim:p=>({rise:p.Q/(p.m*p.c),energy:p.Q}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);
+   let rise=p.Q/(p.m*p.c),fraction=Math.min(1,rise/50);
+   ctx.fillStyle="#ff6544";ctx.globalAlpha=.15+.75*fraction;ctx.fillRect(w*.2,h*.25,w*.6,h*.5);ctx.globalAlpha=1;
+   ctx.strokeStyle=accent();ctx.lineWidth=2;ctx.strokeRect(w*.2,h*.25,w*.6,h*.5);
+   text(ctx,Math.round(rise*10)/10+" °C rise",w*.5,h*.53);}
+ },
+ {title:"Magnetic Field", tag:"MAGNETISM", desc:"Move a test point away from a magnet. Observe a simplified field-strength model as distance changes.",
+  formula:"B ∝ 1/r³  (dipole approximation)", controls:[
+   ["Magnet strength","S",1,100,50,"units"],["Distance","r",1,20,5,"units"]],
+  stats:[["Relative field","units"],["Distance","units"]],
+  sim:p=>({field:p.S/(p.r*p.r*p.r),distance:p.r}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);
+   for(let i=1;i<=5;i++){ctx.beginPath();ctx.strokeStyle=accent();ctx.globalAlpha=.12+i*.1;ctx.ellipse(w*.32,h*.5,i*12,i*18,0,0,Math.PI*2);ctx.stroke();}
+   ctx.globalAlpha=1;ctx.fillStyle="#ff5b5b";ctx.fillRect(w*.28,h*.39,12,h*.22);
+   ctx.fillStyle="#5b9cff";ctx.fillRect(w*.32,h*.39,12,h*.22);
+   let x=w*.35+Math.min(w*.52,p.r/20*w*.52);dot(ctx,x,h*.5,7);
+   line(ctx,w*.36,h*.7,x,h*.7);text(ctx,"N",w*.28,h*.33);text(ctx,"S",w*.34,h*.33);}
+ },
+ {title:"Relativity Runner", tag:"SPACE & TIME", desc:"Explore a simplified relativistic effect. As speed approaches light speed, the Lorentz factor increases sharply.",
+  formula:"γ = 1 / √(1 − v²/c²)", controls:[
+   ["Speed fraction","v",0,99,60,"% of c"]],
+  stats:[["Lorentz factor","γ"],["Speed","m/s"]],
+  sim:p=>({gamma:1/Math.sqrt(1-(p.v/100)**2),speed:p.v/100*299792458}),
+  draw:(c,p,t)=>{const ctx=c.getContext("2d"),w=c.width,h=c.height;clear(ctx,w,h);axes(ctx,w,h);
+   let v=p.v/100, gamma=1/Math.sqrt(1-v*v);
+   for(let i=0;i<9;i++){let x=(i*47+t*100*v)%w;line(ctx,x,h*.2,x-25*v,h*.8);}
+   let r=10+Math.min(35,gamma*3);dot(ctx,w*.5,h*.5,r);
+   text(ctx,"v = "+p.v+"% c",w*.5,h*.2);}
+ }
+];
+
+const container = document.querySelector("#experiments");
+const states = games.map(g => Object.fromEntries(g.controls.map(c => [c[1],c[4]])));
+let clock = 0, running = true, last = performance.now();
+
+function accent(){return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();}
+function clear(ctx,w,h){ctx.clearRect(0,0,w,h);}
+function line(ctx,x1,y1,x2,y2){ctx.beginPath();ctx.strokeStyle=accent();ctx.lineWidth=1.5;ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+function dot(ctx,x,y,r){ctx.beginPath();ctx.fillStyle=accent();ctx.shadowColor=accent();ctx.shadowBlur=14;ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
+function text(ctx,s,x,y){ctx.fillStyle="#9299aa";ctx.font="10px monospace";ctx.textAlign="center";ctx.fillText(s,x,y);}
+function axes(ctx,w,h){ctx.strokeStyle="#252936";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(20,h-20);ctx.lineTo(w-10,h-20);ctx.moveTo(25,10);ctx.lineTo(25,h-15);ctx.stroke();}
+function fmt(n){if(!Number.isFinite(n))return "∞";if(Math.abs(n)>=10000)return n.toExponential(2);return Number(n.toFixed(2)).toString();}
+function sizeCanvas(c){const r=c.getBoundingClientRect();const dpr=Math.min(window.devicePixelRatio||1,2);c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));c.getContext("2d").setTransform(dpr,0,0,dpr,0,0);return c;}
+
+games.forEach((g,i)=>{
+ const id=i+1;
+ const section=document.createElement("section");
+ section.className="experiment";section.id="game-"+id;
+ section.innerHTML=`
+  <div class="experiment-top">
+   <div><div class="game-number">EXPERIMENT ${String(id).padStart(2,"0")}</div>
+   <h3>${g.title}</h3><p class="description">${g.desc}</p></div>
+   <span class="tag">${g.tag}</span>
+  </div>
+  <div class="game-grid">
+   <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+    <div class="visual"><span class="visual-label">LIVE SIMULATION</span><canvas id="sim-${id}"></canvas></div>
+    <div class="visual"><div class="graph-title">LIVE DATA / TIME SERIES</div><canvas class="graph" id="graph-${id}"></canvas></div>
+   </div>
+   <div class="side">
+    <div class="stats">${g.stats.map((s,j)=>`<div class="stat"><small>${s[0]}</small><strong id="stat-${id}-${j}">—</strong><small>${s[1]}</small></div>`).join("")}</div>
+    <div class="controls">
+     ${g.controls.map((c,j)=>`<div class="control">
+      <div class="control-head"><label for="range-${id}-${j}">${c[0]}</label><output id="out-${id}-${j}">${c[4]} ${c[5]}</output></div>
+      <input type="range" id="range-${id}-${j}" min="${c[2]}" max="${c[3]}" step="${(c[3]-c[2])>100?1:0.1}" value="${c[4]}" data-game="${i}" data-key="${c[1]}" data-control="${j}">
+     </div>`).join("")}
+    </div>
+    <div class="formula">PHYSICS MODEL<br><code>${g.formula}</code></div>
+    <div class="game-actions"><button class="primary" id="play-${id}">Ⅱ PAUSE</button><button id="reset-${id}">↺ RESET</button><button id="step-${id}">+ STEP</button></div>
+   </div>
+  </div>`;
+ container.appendChild(section);
+});
+
+const histories=games.map(()=>[]);
+const starts=games.map(()=>performance.now());
+const paused=games.map(()=>false);
+const resetAt=games.map(()=>0);
+
+document.querySelectorAll('input[type="range"]').forEach(input=>{
+ input.addEventListener("input",()=>{
+  const i=+input.dataset.game,j=+input.dataset.control,key=input.dataset.key;
+  states[i][key]=+input.value;
+  const spec=games[i].controls[j];
+  document.querySelector("#out-"+(i+1)+"-"+j).textContent=fmt(+input.value)+" "+spec[5];
+  renderGame(i);
+ });
+});
+games.forEach((g,i)=>{
+ document.querySelector("#play-"+(i+1)).onclick=()=>{
+  paused[i]=!paused[i];
+  document.querySelector("#play-"+(i+1)).textContent=paused[i]?"▶ PLAY":"Ⅱ PAUSE";
+ };
+ document.querySelector("#reset-"+(i+1)).onclick=()=>{
+  states[i]=Object.fromEntries(g.controls.map(c=>[c[1],c[4]]));
+  g.controls.forEach((c,j)=>{
+   const input=document.querySelector("#range-"+(i+1)+"-"+j);
+   input.value=c[4];document.querySelector("#out-"+(i+1)+"-"+j).textContent=c[4]+" "+c[5];
+  });
+  resetAt[i]=clock;histories[i]=[];renderGame(i);
+ };
+ document.querySelector("#step-"+(i+1)).onclick=()=>{clock+=.15;renderGame(i,true);};
+});
+
+function renderGame(i,force=false){
+ const g=games[i],p=states[i],t=Math.max(0,clock-resetAt[i]),id=i+1;
+ const simCanvas=sizeCanvas(document.querySelector("#sim-"+id));
+ const graphCanvas=sizeCanvas(document.querySelector("#graph-"+id));
+ const simCtx=simCanvas.getContext("2d"),graphCtx=graphCanvas.getContext("2d");
+ const w=simCanvas.getBoundingClientRect().width,h=simCanvas.getBoundingClientRect().height;
+ g.draw({getContext:()=>simCtx,width:w,height:h},p,t);
+ const values=g.sim(p,t);
+ const keys=Object.keys(values);
+ g.stats.forEach((s,j)=>{
+  const value=values[keys[j]]??0;
+  document.querySelector("#stat-"+id+"-"+j).textContent=fmt(value);
+ });
+ const arr=histories[i];
+ if(force || !paused[i]){
+  const val=values[keys[0]]??0;
+  if(!arr.length || clock-arr[arr.length-1].t>.08)arr.push({t:clock,v:val});
+  if(arr.length>100)arr.shift();
+ }
+ const gw=graphCanvas.getBoundingClientRect().width,gh=graphCanvas.getBoundingClientRect().height;
+ clear(graphCtx,gw,gh);
+ graphCtx.strokeStyle="#242833";graphCtx.lineWidth=1;
+ for(let x=20;x<gw;x+=35){graphCtx.beginPath();graphCtx.moveTo(x,5);graphCtx.lineTo(x,gh-15);graphCtx.stroke();}
+ for(let y=15;y<gh;y+=30){graphCtx.beginPath();graphCtx.moveTo(15,y);graphCtx.lineTo(gw-5,y);graphCtx.stroke();}
+ graphCtx.strokeStyle=accent();graphCtx.lineWidth=2;graphCtx.beginPath();
+ if(arr.length){
+  const vals=arr.map(a=>a.v),min=Math.min(0,...vals),max=Math.max(1,...vals),span=max-min||1;
+  arr.forEach((a,j)=>{
+   let x=20+j/Math.max(1,arr.length-1)*(gw-35);
+   let y=gh-15-(a.v-min)/span*(gh-35);
+   if(j===0)graphCtx.moveTo(x,y);else graphCtx.lineTo(x,y);
+  });
+  graphCtx.stroke();
+  graphCtx.fillStyle=accent();graphCtx.font="10px monospace";graphCtx.fillText("NOW "+fmt(vals[vals.length-1]),22,13);
+ }
+}
+
+function renderAll(){games.forEach((_,i)=>renderGame(i,true));}
+function loop(now){
+ const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(running)clock+=dt;
+ games.forEach((_,i)=>{if(!paused[i])renderGame(i);});
+ requestAnimationFrame(loop);
+}
+window.addEventListener("resize",renderAll);
+renderAll();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
